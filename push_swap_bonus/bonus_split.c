@@ -1,0 +1,92 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   bonus_split.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vasargsy <vasargsy@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/06/27 18:49:58 by vasargsy          #+#    #+#             */
+/*   Updated: 2022/06/27 18:50:20 by vasargsy         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "checker.h"
+
+static int	word_count(char const *str, char delim)
+{
+	int	prev_del;
+	int	i;
+	int	count;
+
+	i = 0;
+	count = 0;
+	prev_del = 1;
+	while (str[i])
+	{
+		if (str[i] == delim)
+			prev_del = 1;
+		else if (prev_del)
+			count++;
+		if (str[i] != delim)
+			prev_del = 0;
+		i++;
+	}
+	return (count);
+}
+
+static char	*word_fill(const char *s, int start, int len)
+{
+	int		i;
+	char	*word;
+
+	i = 0;
+	word = malloc(len + 1);
+	if (word == 0)
+		return (0);
+	while (i < len)
+	{
+		word[i] = s[start + i];
+		i++;
+	}
+	word[i] = 0;
+	return (word);
+}
+
+static void	*str_free(char **str, int i)
+{
+	while (i >= 0)
+	{
+		free(str[i]);
+		i--;
+	}
+	free(str);
+	return (0);
+}
+
+char	**ft_split(char const *s, char c)
+{
+	int		start;
+	int		end;
+	int		i;
+	char	**str;
+
+	i = -1;
+	start = 0;
+	str = malloc(sizeof (char *) * (word_count(s, c) + 1));
+	if (s == 0 || str == 0)
+		return (0);
+	while (++i < word_count(s, c))
+	{
+		while (s[start] && s[start] == c)
+			start++;
+		end = start;
+		while (s[end] && s[end] != c)
+			end++;
+		str[i] = word_fill(s, start, end - start);
+		if (!str[i])
+			str_free(str, i);
+		start = end;
+	}
+	str[i] = 0;
+	return (str);
+}
